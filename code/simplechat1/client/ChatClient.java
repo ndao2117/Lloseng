@@ -68,6 +68,56 @@ public class ChatClient extends AbstractClient {
   }
 
   /**
+   * This method handles all commands coming from the UI
+   *
+   * @param message The message from the UI.
+   */
+  public void handleCommandFromClientUI(String message) {
+    String[] command = message.split(" ");
+
+    switch (command[0]) {
+      case "#quit":
+        quit();
+        break;
+      case "#logoff":
+        try {
+          closeConnection();
+        } catch (IOException e) {
+        }
+        break;
+      case "#sethost":
+        if (isConnected()) {
+          clientUI.display("Unable to set host.");
+        } else {
+          setHost(command[1]);
+        }
+        break;
+      case "#setport":
+        if (isConnected()) {
+          clientUI.display("Unable to set port.");
+        } else {
+          setPort(Integer.parseInt(command[1]));
+        }
+        break;
+      case "#login":
+        try {
+          openConnection();
+        } catch (IOException e) {
+        }
+        break;
+      case "#gethost":
+        clientUI.display(this.getHost());
+        break;
+      case "#getport":
+        clientUI.display(Integer.toString(this.getPort()));
+        break;
+      default:
+        clientUI.display("Please enter a valid command.");
+        break;
+    }
+  }
+
+  /**
    * Hook method called after the connection has been closed. The default
    * implementation does nothing. The method may be overriden by subclasses to
    * perform special processing such as cleaning up and terminating, or attempting
