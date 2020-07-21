@@ -54,8 +54,27 @@ public class EchoServer extends AbstractServer {
    * @param client The connection from which the message originated.
    */
   public void handleMessageFromClient(Object msg, ConnectionToClient client) {
-    serverUI.display("Message received: " + msg + " from " + client);
-    sendToAllClients(msg);
+    if (String.valueOf(msg).startsWith("#login ")) {
+      if (client.getInfo("user id") != null) {
+        try {
+          client.sendToClient("User ID already set");
+        } catch (IOException e) {
+        }
+      } else {
+        client.setInfo("user id", String.valueOf(msg).substring(7));
+      }
+    } else {
+      if (client.getInfo("user id") != null) {
+        serverUI.display("Message received: " + msg + " from " + client);
+        sendToAllClients(client.getInfo("user id") + ": " + msg);
+      } else {
+        try {
+          client.sendToClient("User ID not set");
+          client.close();
+        } catch (IOException e) {
+        }
+      }
+    }
   }
 
   /**
